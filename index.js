@@ -19,6 +19,10 @@ io.on('connection', socket =>{
     console.log('a user is connected');
 
     socket.emit('message', 'Welcome!')
+
+    socket.on('chat-message', msg => {
+        console.log(`################ ${msg}`);
+    })
    });
    
 
