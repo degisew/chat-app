@@ -9,3 +9,5 @@ router.get('/messages', getMessages)
 
 router.post('/messages/', postMessages)
 
+
+module.exports = router;
