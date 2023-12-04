@@ -16,12 +16,13 @@ app.use(express.static(path.join(__dirname, 'static')));
 // app.use(router);
 
 io.on('connection', socket =>{
-    console.log('a user is connected');
-
-    socket.emit('message', 'Welcome!')
-
-    socket.on('chat-message', msg => {
-        console.log(`################ ${msg}`);
+    socket.broadcast.emit('message','User has joined');
+    socket.on('chatMessage', msg => {
+        socket.emit('message', msg)
+        // console.log(`################ ${msg}`);
+    })
+    socket.on('disconnect', () => {
+        io.emit('message', 'The user left the Chat room.')
     })
    });
    
