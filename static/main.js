@@ -6,9 +6,9 @@ const msg_input = document.getElementById("msg");
 
 const outputMessage = (message) => {
   const div = document.createElement("div");
-  div.innerHTML = `<p class="meta">Brad <span>9:12pm</span></p>
+  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
     <p class="text">
-     ${message}
+     ${message.text}
     </p>`;
 
   container.append(div);
