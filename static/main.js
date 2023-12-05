@@ -10,7 +10,8 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 })
 
-console.log(username, room);
+// Join room
+socket.emit('joinRoom', {username, room});
 
 const outputMessage = (message) => {
   const div = document.createElement("div");

@@ -1,47 +1,49 @@
-require('dotenv').config();
-const moment = require('moment');
-const path = require('path');
+require("dotenv").config();
+const messageFormat = require("./static/utils/messages");
+const {userJoin, getCurrentUser, usersLeave} = require('./static/utils/users')
+const path = require("path");
 // const router = require('./routes/messageRoute');
 // const connectDB = require('./db/connect');
-const express = require('express');
+const express = require("express");
 const app = express();
-const http = require('http');
+const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const { measureMemory } = require('vm');
 const io = new Server(server);
 
 // connectDB();
 
-app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, "static")));
 // app.use(express.json());
 // app.use(router);
 
-chatBotName = 'ChatBot';
+chatBotName = "ChatBot";
 
-const messageFormat = (username, text) => {
-    return {
-        username,
-        text,
-        time: moment().format('h:mm a')
-    }
-}
+io.on("connection", (socket) => {
+  socket.on("joinRoom", ({ username, room }) => {
+    const user = userJoin(socket.id, username, room); 
+    socket.join(user.room);
+    socket.broadcast.to(user.room).emit(
+      "message",
+      messageFormat(chatBotName, `${user.username} has joined the chat.`)
+    );
+  });
 
-io.on('connection', socket =>{
-    socket.broadcast.emit('message',messageFormat(chatBotName, 'User has joined'));
-    socket.on('chatMessage', msg => {
-        socket.emit('message', messageFormat('Dag', msg));
-        // console.log(`################ ${msg}`);
-    })
-    socket.on('disconnect', () => {
-        io.emit('message', messageFormat(chatBotName, 'The user left the Chat room.'));
-    })
-   });
-   
+  socket.on("chatMessage", (msg) => {
+    const user = getCurrentUser(socket.id);
+    io.to(user.room).emit("message", messageFormat(user.username, msg));
+    // console.log(`################ ${msg}`);
+  });
+
+  socket.on("disconnect", () => {
+    const user = usersLeave(socket.id);
+    socket.to(user.room).emit(
+      "message",
+      messageFormat(chatBotName, `${user.username} left the Chat room.`)
+    );
+  });
+});
 
 server.listen(3000, () => {
-    console.log('server is running on port', server.address().port);
-})
-
-
-module.exports = messageFormat;
+  console.log("server is running on port", server.address().port);
+});
