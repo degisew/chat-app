@@ -13,8 +13,7 @@ const options = {
     },
     servers: [
       {
-          // url: process.env.LOCAL_HOST,
-        url: process.env.chat,
+          url: process.env.LOCAL_HOST,
       },
     ],
 
